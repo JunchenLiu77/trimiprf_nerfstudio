@@ -6,14 +6,15 @@ build-backend = "setuptools.build_meta"
 authors = [
     {name = "Junchen Liu", email = "liujunchen0214@gmail.com"},
     {name = "Zhuo Yang", email = "zhuoyang@bit.edu.cn"},
-    {name = "Wenbo Hu", email = "wbhu@tencent.com"},
+    {name = "Wenbo Hu", email = "huwenbodut@gmail.com"},
     {name = "Hao Zhao", email = "zhaohao@air.tsinghua.edu.cn"},
 ]
 name = "trimiprf_nerfstudio"
 description = "Tri-MipRF nerfstudio integration"
 readme = "README.md"
 dependencies=[
-    "nerfstudio>=0.2.0"
+    "nerfstudio>=0.2.0",
+    "nvdiffrast>=0.3.1"
 ]
 dynamic = ["version"]
 

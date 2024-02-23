@@ -24,7 +24,7 @@ from typing import Dict, List, Literal, Optional, Tuple, Type
 import nerfacc
 import torch
 from torch.nn import Parameter
-from torchmetrics import PeakSignalNoiseRatio
+from torchmetrics.image import PeakSignalNoiseRatio
 from torchmetrics.functional import structural_similarity_index_measure
 from torchmetrics.image.lpip import LearnedPerceptualImagePatchSimilarity
 
@@ -262,8 +262,6 @@ class TriMipRFModel(Model):
             gt_image=image,
         )
         rgb_loss = self.rgb_loss(image, pred_rgb)
-        if self.config.use_gradient_scaling:
-            rgb_loss = self.grad_scaler.scale(rgb_loss)
         loss_dict = {"rgb_loss": rgb_loss}
         return loss_dict
 

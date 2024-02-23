@@ -11,7 +11,8 @@ It provides an alternative way to use `Tri-Mip Encoding` in addition to the [off
 ## **Installation**
 
 1. [Install nerfstudio](https://docs.nerf.studio/en/latest/quickstart/installation.html). This is `pip install nerfstudio`, but there are a few dependencies (e.g. `torch`, `tinycudann`) which may require further steps, so make sure to check their installation guide!
-2. Install the trimiprf nerfstudio integration (this repository): `pip install trimiprf-nerfstudio`
+2. [Install nvdiffrast](https://nvlabs.github.io/nvdiffrast/).
+3. Install the trimiprf nerfstudio integration (this repository): `pip install .`
 
 ### Running Model
 

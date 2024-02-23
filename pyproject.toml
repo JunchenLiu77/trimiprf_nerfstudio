@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+authors = [
+    {name = "Junchen Liu", email = "liujunchen0214@gmail.com"},
+    {name = "Zhuo Yang", email = "zhuoyang@bit.edu.cn"},
+    {name = "Wenbo Hu", email = "wbhu@tencent.com"},
+    {name = "Hao Zhao", email = "zhaohao@air.tsinghua.edu.cn"},
+]
+name = "trimiprf_nerfstudio"
+description = "Tri-MipRF nerfstudio integration"
+readme = "README.md"
+dependencies=[
+    "nerfstudio>=0.2.0"
+]
+dynamic = ["version"]
+
+[project.entry-points."nerfstudio.method_configs"]
+trimiprf = "trimiprf.trimiprf_config:trimiprf_method"
+
+[tool.setuptools]
+include-package-data = true
+packages = [
+    "trimiprf",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "trimiprf.__version__" }
+

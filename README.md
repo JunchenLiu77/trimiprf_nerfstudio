@@ -8,13 +8,13 @@ This repository provides code to integrate the [Tri-MipRF](https://wbhu.github.i
 
 It provides an alternative way to use `Tri-Mip Encoding` in addition to the [official repository](https://github.com/wbhu/Tri-MipRF), which allows access to nerfstudio's in-browser viewer and additional training capabilities. Beware that some details about the training procedure differ from the official repository.
 
-## **Installation**
+## Installation
 
-1. [Install nerfstudio](https://docs.nerf.studio/en/latest/quickstart/installation.html). This is `pip install nerfstudio`, but there are a few dependencies (e.g. `torch`, `tinycudann`) which may require further steps, so make sure to check their installation guide!
-2. [Install nvdiffrast](https://nvlabs.github.io/nvdiffrast/).
+1. Install [nerfstudio](https://docs.nerf.studio/en/latest/quickstart/installation.html). This is `pip install nerfstudio`, but there are a few dependencies (e.g. `torch`, `tinycudann`) which may require further steps, so make sure to check their installation guide!
+2. Install [nvdiffrast](https://nvlabs.github.io/nvdiffrast/).
 3. Install the trimiprf nerfstudio integration (this repository): `pip install .`
 
-### Running Model
+## Running Model
 
 ```bash
 ns-train trimiprf --data <data-folder>

@@ -20,6 +20,17 @@ It provides an alternative way to use `Tri-Mip Encoding` in addition to the [off
 ns-train trimiprf --data <data-folder>
 ```
 
+## Benchmarks
+
+> The observed decrease in performance, when compared to the official implementation, is primarily due to the choice of optimizer. However, the optimizer utilized in the official implementation does not enhance performance as expected. PRs that propose modifications to the optimizer or suggest alternative methods to improve performance are highly welcomed.
+
+**Single Scale Synthetic NeRF**
+
+|           | chair | drums | ficus | hotdog | lego  | materials | mic   | ship  |
+| --------- | ----- | ----- | ----- | ------ | ----- | --------- | ----- | ----- |
+| **PSNR**  | 34.69 | 24.51 | 30.90 | 35.76  | 34.38 | 27.56     | 35.12 | 18.47 |
+| **SSIM**  | 0.980 | 0.913 | 0.967 | 0.974  | 0.975 | 0.917     | 0.987 | 0.620 |
+| **LPIPS** | 0.014 | 0.083 | 0.032 | 0.026  | 0.012 | 0.073     | 0.011 | 0.465 |
 
 ## Roadmap
 

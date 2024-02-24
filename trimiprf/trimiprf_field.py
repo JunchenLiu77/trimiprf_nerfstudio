@@ -63,6 +63,7 @@ class TriMipRFField(Field):
         net_width: int = 128,
         implementation: Literal["tcnn", "torch"] = "tcnn",
         average_init_density: float = 1.0,
+        gpu_limitation: int = 4000000,
         spatial_distortion: Optional[SpatialDistortion] = None,
     ) -> None:
         super().__init__()
@@ -73,14 +74,12 @@ class TriMipRFField(Field):
         )
         self.max_radius = (self.aabb[1, :] - self.aabb[0, :]).max() / 2
         self.geo_feat_dim = geo_feat_dim
-        self.log2_feat_grid_resolution = math.log2(
-            feat_grid_resolution
-        )  # compute ahead
-        self.log2_occ_grid_resolution = math.log2(occ_grid_resolution)  # compute ahead
+        self.log2_feat_grid_resolution = math.log2(feat_grid_resolution)
+        self.log2_occ_grid_resolution = math.log2(occ_grid_resolution)
         self.average_init_density = average_init_density
         self.spatial_distortion = spatial_distortion
 
-        self.encoding = TriMipEncoding(n_levels, feat_grid_resolution, feat_dim)
+        self.encoding = TriMipEncoding(n_levels, feat_grid_resolution, feat_dim, gpu_limitation=gpu_limitation)
         self.mlp_base = MLP(
             in_dim=self.encoding.get_out_dim(),
             out_dim=geo_feat_dim + 1,
@@ -144,7 +143,11 @@ class TriMipRFField(Field):
             levels = torch.log2(sample_ball_radius / self.max_radius)
         levels += self.log2_feat_grid_resolution
         feat = self.encoding((positions, levels))
-        h = self.mlp_base(feat).view(*ray_samples.frustums.shape, -1)
+        res = self.mlp_base(feat)
+        if ray_samples.frustums.shape[0] == 0:
+            h = res
+        else:
+            h = res.view(*ray_samples.frustums.shape, -1)
         density_before_activation, base_mlp_out = torch.split(
             h, [1, self.geo_feat_dim], dim=-1
         )

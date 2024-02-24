@@ -30,7 +30,8 @@ trimiprf_method = MethodSpecification(
                 near_plane=2.0,
                 far_plane=6.0,
                 background_color="white",
-                use_gradient_scaling=True
+                use_gradient_scaling=True,
+                gpu_limitation=4000000,
             ),
         ),
         optimizers={

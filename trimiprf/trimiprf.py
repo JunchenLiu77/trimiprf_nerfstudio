@@ -21,6 +21,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Literal, Optional, Tuple, Type
 
+from networkx import group_out_degree_centrality
+
 import nerfacc
 import torch
 from torch.nn import Parameter
@@ -99,6 +101,8 @@ class TriMipRFModelConfig(ModelConfig):
     """The color that is given to untrained areas."""
     disable_scene_contraction: bool = True
     """Whether to disable scene contraction or not."""
+    gpu_limitation: int = 4000000
+    """The limitation of sample points passed to Nvdiffrast."""
 
 
 class TriMipRFModel(Model):
@@ -133,6 +137,7 @@ class TriMipRFModel(Model):
             net_depth_color=self.config.net_depth_color,
             net_width=self.config.net_width,
             implementation=self.config.implementation,
+            gpu_limitation=self.config.gpu_limitation,
             spatial_distortion=scene_contraction,
         )
 

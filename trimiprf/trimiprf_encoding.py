@@ -14,6 +14,7 @@ class TriMipEncoding(Encoding):
         resolution: int,
         feat_dim: int,
         include_xyz: bool = False,
+        gpu_limitation: int = 4000000,
     ):
         super().__init__(in_dim=3)
         self.n_levels = n_levels
@@ -27,6 +28,7 @@ class TriMipEncoding(Encoding):
         )
         self.init_parameters()
         self.out_dim = self.feat_dim * 3 + (3 if include_xyz else 0)
+        self.gpu_limitation = gpu_limitation
 
     def init_parameters(self) -> None:
         # Important for performance
@@ -38,28 +40,34 @@ class TriMipEncoding(Encoding):
         x, level = in_tensor
         # x in [0, 1], level in [0, max_level]
         # x is Nx3, level is Nx1
-        if 0 == x.shape[0]:
+        if x.shape[0] == 0:
             return torch.zeros([x.shape[0], self.feat_dim * 3]).to(x)
-        decomposed_x = torch.stack(
-            [
-                x[:, None, [1, 2]],
-                x[:, None, [0, 2]],
-                x[:, None, [0, 1]],
-            ],
-            dim=0,
-        )  # 3xNx1x2
-        if 0 == self.n_levels:
-            level = None
-        else:
-            torch.stack([level, level, level], dim=0)
-            level = torch.broadcast_to(level, decomposed_x.shape[:3]).contiguous()
-        feat = nvdiffrast.torch.texture(
-            self.fm,
-            decomposed_x,
-            mip_level_bias=level,
-            boundary_mode="clamp",
-            max_mip_level=self.n_levels - 1,
-        )  # 3xNx1xC
+        # RuntimeError: Cuda error: 9[cudaLaunchKernel(func_tbl[func_idx], gridSize, blockSize, args, 0, stream);]
+        # indicates that the input is too large, split the input into smaller chunks, ugly but works
+        feats = []
+        for i in range(0, x.shape[0], self.gpu_limitation):
+            end = min(i + self.gpu_limitation, x.shape[0])
+            decomposed_x = torch.stack(
+                [
+                    x[i:end, None, [1, 2]],
+                    x[i:end, None, [0, 2]],
+                    x[i:end, None, [0, 1]],
+                ],
+                dim=0,
+            )
+            level_expanded = torch.broadcast_to(
+                level[i:end, :], decomposed_x.shape[:3]
+            ).contiguous()
+            feats.append(
+                nvdiffrast.torch.texture(
+                    self.fm,
+                    decomposed_x,
+                    mip_level_bias=level_expanded,
+                    boundary_mode="clamp",
+                    max_mip_level=self.n_levels - 1,
+                )
+            )
+        feat = torch.cat(feats, dim=1)
         enc = (
             feat.permute(1, 2, 0, 3).contiguous().view(x.shape[0], self.feat_dim * 3)
         )  # Nx(3C)
